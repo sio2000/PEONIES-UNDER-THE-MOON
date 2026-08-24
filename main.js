@@ -76,7 +76,7 @@ const PETALS = [
 ];
 
 const LEAF = ['#16272a', '#1a2f2b', '#132325'];
-const BUD  = '#6d7b60';   // the green a peony wears before it opens
+const BUD  = '#74836a';   // the green a peony wears before it opens
 
 /* ─────────────────────────── flower sprites ────────────────────────── */
 /* Each bloom is drawn once per (variant · bloom step · size bucket) into an
@@ -135,7 +135,7 @@ function drawPeony(g, size, bloom, variant) {
     const ring = RINGS[r];
     const o = easeOutCubic(clamp((bloom - ring.delay) / (1 - ring.delay), 0, 1));
 
-    const baseLen = R * ring.scale * (0.34 + 0.66 * o);
+    const baseLen = R * ring.scale * (0.33 + 0.67 * o);
     const curl = (1 - o) * 0.30;              // petals still folded inward
     const squeeze = 0.84 + 0.16 * o;
 
@@ -151,7 +151,7 @@ function drawPeony(g, size, bloom, variant) {
       g.transform(squeeze, 0, curl * (i % 2 ? 1 : -1), 1, 0, 0);
 
       /* a closed bud is still half green; the colour floods in as it opens */
-      const green = (1 - bloom) * 0.46;
+      const green = (1 - bloom) * 0.44;
       const grad = g.createLinearGradient(0, 0, 0, len);
       grad.addColorStop(0.00, mix(mix(P.mid, P.base, o), BUD, green));
       grad.addColorStop(0.42, mix(mix(P.tip, P.mid, o), BUD, green * 0.72));
@@ -426,7 +426,9 @@ function tween(prop, to, dur, ease = easeInOutCubic) {
     if (devTakeover) { res(); return; }
     for (let i = tweens.length - 1; i >= 0; i--)
       if (tweens[i].prop === prop) { tweens[i].res(); tweens.splice(i, 1); }
-    tweens.push({ prop, from: S[prop], to, dur: reduced ? Math.min(dur, 700) : dur, t: 0, ease, res });
+    /* call sites give milliseconds; the clock here counts seconds */
+    const ms = reduced ? Math.min(dur, 700) : dur;
+    tweens.push({ prop, from: S[prop], to, dur: ms / 1000, t: 0, ease, res });
   });
 }
 function stepTweens(dt) {
@@ -580,7 +582,7 @@ function drawGarden(t) {
   if (order.length !== flowers.length) order = flowers.slice();
   order.sort((a, b) => b.z - a.z);              // far to near
 
-  const light = 0.30 + S.moon * 0.70;
+  const light = 0.40 + S.moon * 0.60;
 
   for (let i = 0; i < order.length; i++) {
     const f = order[i];
@@ -980,7 +982,7 @@ const audio = (() => {
 
 async function sceneArrival() {
   await wait(650);
-  tween('moon', 0.16, 4400, easeOutSine);
+  tween('moon', 0.30, 4400, easeOutSine);
   await wait(1500);
   await say('Καλώς ήρθες, Μπεμπού', { hold: 2500 });
   tween('garden', 0.20, 5200, easeOutSine);
@@ -1145,6 +1147,22 @@ if (location.hash === '#dev') {
   window.__garden = {
     S, cam, flowers, tween, sprite, drawPeony, audio,
     setDpr(v) { DPR = v; applyCanvasSize(); updateCamera(); return DPR; },
+    /* advance the scene clock by hand, at a fixed 60fps step, so the real
+       timed sequence can be inspected without depending on a live rAF */
+    tick(sec = 1) {
+      const step = 1 / 60;
+      for (let i = 0, n = Math.round(sec / step); i < n; i++) {
+        stepTweens(step);
+        if (bloomActive) { S.progress += (S.target - S.progress) * step * 2.4; applyProgress(); }
+        for (const f of flowers) {
+          const target = easeOutCubic(clamp((S.progress - f.t0) / 0.12, 0, 1));
+          f.bloom += (target - f.bloom) * Math.min(1, step * 2.0);
+        }
+      }
+      updateCamera();
+      render(t, step);
+      return { moon: +S.moon.toFixed(3), garden: +S.garden.toFixed(3) };
+    },
     bench(n = 90) {                      // pure raster cost of one frame, in ms
       updateCamera();
       render(1, 0.016);                  // warm the sprite cache first

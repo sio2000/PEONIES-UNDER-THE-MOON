@@ -168,13 +168,16 @@ body{
   pointer-events:none;opacity:0;
   transition:opacity 1.4s ease;
 }
-#hint.in{opacity:.5}
+#hint.in{opacity:.62}
 .hint-label{
-  font-size:.6rem;letter-spacing:.26em;text-transform:uppercase;
+  font-size:.6rem;letter-spacing:.24em;text-transform:uppercase;
   font-weight:200;color:var(--ink-soft);
+  white-space:nowrap;
+  text-shadow:0 0 12px rgba(6,9,20,.95),0 1px 3px rgba(4,6,14,.9);
 }
 .hint-chev{
-  width:15px;height:15px;border-left:1px solid var(--ink-faint);border-top:1px solid var(--ink-faint);
+  width:14px;height:14px;border-left:1px solid rgba(244,236,230,.42);border-top:1px solid rgba(244,236,230,.42);
+  filter:drop-shadow(0 0 6px rgba(6,9,20,.9));
   transform:rotate(45deg);
   animation:chev 3.4s cubic-bezier(.4,0,.2,1) infinite;
 }

@@ -817,7 +817,8 @@ function applyProgress() {
 function addProgress(v) {
   if (!bloomActive) return;
   S.target = clamp(S.target + v, 0, 1);
-  if (S.target > 0.02) hideHint();
+  hideHint();
+  nudgeSoon();
   for (const m of milestones) {
     if (!m.done && S.target >= m.at) { m.done = true; say(m.text, { hold: 2600, soft: m.soft }); }
   }
@@ -882,10 +883,39 @@ function showCTA(label, withArrow = true) {
   });
 }
 
+/* The hint is not a one-off. It steps out of the way while she is moving and
+   comes back whenever she stops, saying a little more each time — because the
+   thing she needs to know is not "swipe", it is "keep going". */
 const hintEl = $('#hint');
-let hintShown = false;
-function showHint() { if (!hintShown) { hintShown = true; hintEl.classList.add('in'); } }
+const hintLabel = hintEl.querySelector('.hint-label');
+
+const HINTS = [
+  'σύρε προς τα πάνω',
+  'συνέχισε… έχει κι άλλο',
+  'μη σταματάς',
+];
+
+let hintStage = -1, hintTimer = null;
+
+function showHint(stage) {
+  if (stage !== hintStage) {
+    hintStage = stage;
+    hintLabel.textContent = HINTS[Math.min(stage, HINTS.length - 1)];
+  }
+  hintEl.classList.add('in');
+}
+
 function hideHint() { hintEl.classList.remove('in'); }
+
+/* she stopped; wait a beat, then nudge her on */
+function nudgeSoon() {
+  clearTimeout(hintTimer);
+  if (!bloomActive) return;
+  hintTimer = setTimeout(() => {
+    if (!bloomActive || S.target > 0.99) return;
+    showHint(Math.min(hintStage + 1, HINTS.length - 1));
+  }, 2600);
+}
 
 /* ─────────────────────────────── audio ─────────────────────────────── */
 /* A streamed mp3, not a decoded buffer: a two-minute track held as raw PCM
@@ -1022,12 +1052,13 @@ async function sceneBloom() {
   applyProgress();
   railEl.classList.add('in');
   await wait(700);
-  showHint();
+  showHint(0);
 }
 
 async function finale() {
   bloomActive = false;
   railEl.classList.remove('in');
+  clearTimeout(hintTimer);
   hideHint();
   clearLines();
 

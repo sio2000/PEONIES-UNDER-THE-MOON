@@ -1,0 +1,53 @@
+<!doctype html>
+<html lang="el">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover, maximum-scale=1">
+<meta name="theme-color" content="#05070f">
+<meta name="color-scheme" content="dark">
+<title>Peonies Under the Moon</title>
+<meta name="description" content="Ένας μικρός νυχτερινός κήπος με παιώνιες.">
+<meta property="og:title" content="Peonies Under the Moon">
+<meta property="og:description" content="Ένας μικρός νυχτερινός κήπος με παιώνιες.">
+<meta property="og:type" content="website">
+<link rel="icon" href="favicon.svg" type="image/svg+xml">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="preload" as="style" href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;1,300&family=Inter:wght@200;300;400&display=swap">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;1,300&family=Inter:wght@200;300;400&display=swap" media="print" onload="this.media='all'">
+<noscript><link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;1,300&family=Inter:wght@200;300;400&display=swap"></noscript>
+<link rel="stylesheet" href="styles.css">
+</head>
+<body>
+<main id="stage" aria-label="Peonies Under the Moon">
+  <canvas id="scene" aria-hidden="true"></canvas>
+  <div id="grain" aria-hidden="true"></div>
+  <div id="vignette" aria-hidden="true"></div>
+
+  <div id="ui">
+    <div id="captions" role="status" aria-live="polite"></div>
+    <div id="cta"></div>
+  </div>
+
+  <div id="hint" aria-hidden="true">
+    <span class="hint-chev"></span>
+    <span class="hint-label">σύρε απαλά προς τα πάνω</span>
+  </div>
+
+  <div id="rail" aria-hidden="true"><i></i></div>
+
+  <button id="sound" type="button" aria-label="Ήχος" aria-pressed="false">
+    <svg viewBox="0 0 24 24" aria-hidden="true">
+      <path class="s-body" d="M4 9.5h3.2L11.5 6v12L7.2 14.5H4z"/>
+      <path class="s-on" d="M15 9.2a4 4 0 0 1 0 5.6M17.6 6.6a7.6 7.6 0 0 1 0 10.8"/>
+      <path class="s-off" d="M15.4 9.6l5 4.8M20.4 9.6l-5 4.8"/>
+    </svg>
+  </button>
+
+  <noscript>
+    <div class="noscript">Χρειάζεται JavaScript για να ανθίσει ο κήπος.</div>
+  </noscript>
+</main>
+<script src="main.js" defer></script>
+</body>
+</html>
